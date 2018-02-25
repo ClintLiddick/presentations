@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Blah</title>
+    <meta name="author" content="Clint Liddick">
+
+    <link rel="stylesheet" href="../third_party/reveal.js/css/reveal.css">
+    <link rel="stylesheet" href="../third_party/reveal.js/css/theme/white.css">
+    <link rel="stylesheet" href="../third_party/prism/prism.css">
+
+  </head>
+
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <h2>First</h2>
+          <ul>
+            <li class="fragment">blah</li>
+            <li class="fragment">blah</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Second</h2>
+
+          <pre data-src="test.py"></pre>
+        </section>
+      </div> 
+    </div>
+
+    <script src="../third_party/reveal.js/lib/js/head.min.js"></script>
+    <script src="../third_party/reveal.js/lib/js/classList.js"></script>
+    <script src="../third_party/reveal.js/js/reveal.js"></script>
+    <script src="../third_party/reveal.js/plugin/notes/notes.js"></script>
+    <!-- <script src="../third_party/reveal.js/plugin/math/math.js"></script> -->
+    <script src="../third_party/prism/prism.js"></script>
+    <script>
+      Reveal.initialize({
+        controls: false,
+        controlsTutorial: false,
+        progress: false,
+        slideNumber: true,
+
+        dependencies: [
+        	{ src: '../third_party/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+        	{ src: '../third_party/reveal.js/plugin/notes/notes.js', async: true },
+        	<!-- { src: '../third_party/reveal.js/plugin/math/math.js', async: true } -->
+        ]
+          });
+    </script>
+  </body>
+</html> 
