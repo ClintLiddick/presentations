@@ -7,5 +7,5 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 
-firefox http://localhost:8000/$1/slides.html
+firefox -private-window http://localhost:8000/$1/slides.html
 python3 -m http.server 8000
