@@ -32,6 +32,7 @@ Pros:
 
 Cons:
 - Client/server oriented
+    - dumb client complex server
 - Standalone, libmicrohttpd, or FastCGI
 - WebSockets add flexibility for browser apps, but not well supported
 
@@ -114,6 +115,28 @@ Tcl<br>
   </tr>
 </table>
 
+## Architecture
+
+- Message passing becomes central to app
+- Can also be auxillary for logging or metrics
+    - HWM and drop
+- Why we need zmq: http://zguide.zeromq.org/page:all#toc18
+
+## Core Patterns
+
+- http://api.zeromq.org/4-1:zmq-socket
+- pub/sub
+    - xpub/xsub
+        - subscription passthrough
+- req/rep
+    - dealer/router
+- push/pull
+- pair
+
+## Simple Example
+
+- ping/pong
+
 ## How ZMQ Works
 
 - Education: docs
@@ -123,15 +146,43 @@ Tcl<br>
         - TCP, UDP, IPC
         - inproc
     - background thread
+		- http://zguide.zeromq.org/page:all#I-O-Threads
     - queuing on both sides
-    
+	- error handling
+	    - http://zguide.zeromq.org/page:all#Handling-Errors-and-ETERM
+
 ## Sending Complex Data
 
+- message and frame
+    - filtering
+    - multipart as envelope pattern
 - protobuf
 - this means you can invent any domain specific "protocol" you want
     - not just GET/PUT/POST/DELETE
         - is GET idempotent?
     - RPC
+
+## Use Cases: parallel processing
+- thumbnail images
+- signal to start
+
+## Use Cases: multi-threading
+- same as above
+
+## Use Cases: IPC plugins
+- req/rep when "server" dies? timeout?
+- messaging-based api for plugins
+- executor wraps plugin libs
+- launch each registered plugin and run a socket for each
+
+## Configuration
+- command line or "orchestration"
+- local config (in-repo)
+- centralized
+- discovery
+    - DNS
+    - etcd
+
 
 ## FAQs
 
