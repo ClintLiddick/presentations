@@ -1,22 +1,13 @@
-# ZeroMQ: <small>Communication beyond REST</small>
+# ZeroMQ: <small>Communication beyond HTTP</small>
 
 Clint Liddick
 January 01, 2018
 
 ---
 
-## Test
+## ZeroMQ: <small>Sockets on steroids</small>
 
-blah
-
-
----
-
-## Thesis
-
-HTTP and RESTful communication architectures are overemphasized to the exclusion of other networking patterns and technologies.
-ZeroMQ is a networking library with an emphasis on simplicity.
-It has many use cases including:
+#### Use Cases
 
 - Large scale networked communication.
 - RPC
@@ -25,18 +16,44 @@ It has many use cases including:
 - Architecture prototyping.
 - Robust plugin systems.
 
-## HTTP
+Notes:
+- HTTP and RESTful communication architectures are overemphasized to the exclusion of other networking patterns and technologies.
+- ZeroMQ is a networking library with an emphasis on simplicity.
 
-HTTP is simple to use, but forces a single client/server architecture on applications and pushes other problems onto complex infrastructure (e.g. load-balancing).
+---
 
-Pros:
-- Conceptually simple (at first)
+## HTTP: <small>What it's good at</small>
 
-Cons:
-- Client/server oriented
-    - dumb client complex server
-- Standalone, libmicrohttpd, or FastCGI
-- WebSockets add flexibility for browser apps, but not well supported
+<!-- TODO: big complex server small clients diagram -->
+
+Notes:
+- Thin client / complex server oriented
+
+---
+
+## HTTP: <small>What we often want</small>
+
+<!-- TODO: diagram: many medium complexity peers, with some thin leafs. -->
+<!-- TODO: Plausible names for components -->
+
+Notes:
+
+---
+
+## HTTP: <small>What usually happens</small>
+
+<!-- TODO: diagram: layers of server + nginx and clients + varying embedded library/frameworks -->
+
+
+Notes:
+
+HTTP is not simple to implement, and while most languages and application frameworks have an HTTP client, embedding an HTTP server in an application is neither trivial nor consistent across languages.
+And it usually requires running an additional server application (nginx, Apache) in front anyway.
+
+- "Standalone" server requires libmicrohttpd, FastCGI, uWSGI
+    - Usually need to stand up secondary HTTP server frontend like nginx or Apache anyway.
+
+---
 
 ## Sockets
 
@@ -47,10 +64,13 @@ Cons:
     - Error handling (reconnects)
     - Multiple connections
     - Interop/inconsistencies
-    - All the other complexities of desining architecture and protocol
+    - All the other complexities of designing architecture and protocol
 
 Notes:
-https://beej.us/guide/bgnet/html/multi/clientserver.html
+- The problem is an imposed protocol and structure that we shoehorn our own protocols into/on top of
+- Let's go down a level and see what's what
+- https://beej.us/guide/bgnet/html/multi/clientserver.html
+- That sockets are a better metaphore for many applications is evident in the rise of WebSockets, which recreates traditional socket programming in JavaScript.
 
 ## ZeroMQ
 
