@@ -14,7 +14,9 @@ blah
 
 ## Thesis
 
-HTTP and RESTful communication architectures are overemphasized to the exclusion of other networking patterns and technologies. ZeroMQ is a networking library with an emphasis on simplicity. It has many use cases including:
+HTTP and RESTful communication architectures are overemphasized to the exclusion of other networking patterns and technologies.
+ZeroMQ is a networking library with an emphasis on simplicity.
+It has many use cases including:
 
 - Large scale networked communication.
 - RPC
