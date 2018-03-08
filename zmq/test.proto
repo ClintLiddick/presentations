@@ -1,5 +1,0 @@
-syntax = "proto2";
-
-message Thing {
-  optional int32 id = 1;
-}

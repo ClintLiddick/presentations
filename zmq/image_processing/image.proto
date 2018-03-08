@@ -1,0 +1,6 @@
+syntax = "proto2";
+
+message Image {
+  optional string original_filename = 1;
+  optional bytes image_data = 2;
+}

@@ -1,6 +1,9 @@
 # ZeroMQ
 **Communication beyond HTTP**
 
+Notes:
+35 mins
+
 ---
 
 ## ZeroMQ
