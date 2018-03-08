@@ -12,6 +12,8 @@ python_version = "3.5"
 
 [dev-packages]
 
+meson = "*"
+ipython = "*"
 
 
 [packages]
@@ -19,5 +21,4 @@ python_version = "3.5"
 pyzmq = "*"
 protobuf = "*"
 pillow = "*"
-ipython = "*"
-meson = "*"
+"e1839a8" = {path = ".", editable = true}
