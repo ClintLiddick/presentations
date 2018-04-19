@@ -93,13 +93,87 @@ And ZeroMQ has bindings for almost any language you could name
 
 <!-- TODO: lang list -->
 
+Let's go back to our first example now and talk about how ZeroMQ works.
+
+ZeroMQ's core concept is called a socket.
+These are not standard sockets, but the metaphore is ok.
+There are different types of sockets that provide different communication patterns.
+
+In our example we use the request (REQ) and reply (REP) socket types to get a two-way, RPC-like pattern.
+Usually a "server" or more stable, static, or known part of your architecture is acting as the reply socket (the receiver of requests).
+This is just like a function call.
+
+<!-- TODO function signature fn: req -> rep -->
+
+Both our send and receive block here, though there is also a polling mechanism if you want to manage a collection of sockets or query message status.
+
+The next socket types are publish and subscribe.
+<!-- TODO: slide? code example? -->
+This is simple one-way N to M broadcasting.
+This is the simplest communication mechanism, and is basically used when you want to publish information without expecting a response.
+You don't even know who's listening.
+
+# Pro Tip: Don't implement RPC over Pub/Sub
+
+It's a good idea to have your publishing side use bind, and any subscribers use connect.
+<!-- TODO: mention context and bind/connect first? -->
+
+Next we have push and pull.
+<!-- TODO: animation of msg getting sent (arrow) to different subscribers -->
+This is a one-way pattern like publish and subscribe, but with receiver round-robining.
+That means that whenever a message is pushed, it is pulled by one next available puller.
+
+Now there are other more complex socket types as well that we can only cover briefly here, but are important for more complex topologies.
+
+The XPUB and XSUB sockets are just like their pub/sub counterparts but they also pass along subscription information.
+When a socket connects or drops for example.
+You can use this to create routers or proxies by forwarding messages along to another socket transparently.
+
+<!-- TODO: proxy diagram -->
+
+The DEALER and ROUTER socket types are like reply and request sockets with N to M round robining.
+That means you can serve requests to multiple different "servers" to do the work, and because of some extra routing metadata the answer gets back to the right requestor.
+
+There is a PAIR type that is an exclusive one to one but two-way socket specifically for use by two different threads in the same process.
+We'll talk about in and inter process usage in a moment.
+
+You can also get a native TCP streaming socket, in case you want to get really nasty and work directly w/ TCP packets.
+
+
+Whew.
+That was a lot.
+
+Let's step back and look at a couple simple examples using these sockets.
+
+We have our ping pong example for request and reply.
+You could imagine a lot of REST APIs where you're not really posting a document but invoking some action on a server somewhere and getting a response (even if it's just a success or failure code).
+RPC is an old but excellent mechanism.
+
+As a publish/subscribe example, let's a lightweight remote logging mechanism.
+
+<!-- TODO: many servers with many pubishers with one aggregator -->
+
+
+TODO: push/pull image processing (supercomputer)
+TODO: img processing w/ notification later
+
+...
+
+Now you might be wondering what happens when things go wrong, because the first rule of networking is
+
+# Things Will Fail
+
 
 - introduce zmq core concepts
+  - context
+  - socket types
+  - transport
+  - error handling
 - problems it solves
 - implications
 - how can we use this? example patterns (simple to complex)
 - what is hard/unsolved?
-  - serialization
+  - serialization (we've been using just strings)
   - discovery
 
 
