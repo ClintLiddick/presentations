@@ -95,7 +95,14 @@ And ZeroMQ has bindings for almost any language you could name
 
 Let's go back to our first example now and talk about how ZeroMQ works.
 
-ZeroMQ's core concept is called a socket.
+The first API is the Context object.
+The context is what you use to create connections and set connection options.
+There are really only two rules.
+One, never share a context between threads (just make a new one instead).
+Two, most connection options only apply to connections made after the option was set.
+
+
+Now ZeroMQ's core concept is called a socket.
 These are not standard sockets, but the metaphore is ok.
 There are different types of sockets that provide different communication patterns.
 
@@ -149,32 +156,95 @@ We have our ping pong example for request and reply.
 You could imagine a lot of REST APIs where you're not really posting a document but invoking some action on a server somewhere and getting a response (even if it's just a success or failure code).
 RPC is an old but excellent mechanism.
 
+<!-- TODO clint new example -->
 As a publish/subscribe example, let's a lightweight remote logging mechanism.
 
 <!-- TODO: many servers with many pubishers with one aggregator -->
 
+Alright, now let's do a bunch of compute intensive processing.
+Say we want to process a bunch of images.
+The images could come from any source, but let's say there are a bunch of them or they're coming in fast.
+This is a great case for a push/pull setup.
+Your image source or job dispatcher pushes image data, and you have a bunch of compute resources online pulling and doing the processing.
+Those pullers can publish their results to some aggregator for storage or further processing.
 
-TODO: push/pull image processing (supercomputer)
-TODO: img processing w/ notification later
+In the batch processing scenario, there's a gotcha to watch out for.
+You may send the first puller to come online a bunch of messages before the rest get a chance to come up.
+In this case, you'll want a notification mechanism that all consumers are ready.
+Similiarly, you may want to know when you're done processing your batch so you can clean up and exit.
+Maybe your compute resources are expensive.
+This is a very common pattern in supercomputer programming.
 
-...
+<!-- TODO: progressive diagram w/ pusher, pullers, aggregator, and notifications -->
+
+If instead of batch processing you have a stream of incoming images to process, you could also implement your own elastic scaling.
+Your source node can register how many items it has to process, or how large its backlog is, and request more processing nodes be stood up.
+
+
+Ok, now, let's go deeper.
+
+What happens when you actually send a message?
+ZeroMQ takes your message and puts it in a message queue.
+<!-- TODO: diagram -->
+
+Then background I/O worker threads actually push your message out over your selected transport.
+Background threads are NOT one per client or one per connection.
+They are per socket based on volume of transmitted data.
+As a rule of thumb you'll want one worker thread per GB of data sent per second.
+
+The message queue means the actual I/O work happens asynchronously.
+Nifty.
+
+Next we hit the transport layer.
+Most networked solutions will use a TCP transport, but IPC, inprocess, and PGM are also options.
+So, if you're doing all your work on a single computer, you don't have to pay the cost of sending messages to yourself over the network.
+If you're doing all your work in a single *process*, then you can use the inprocess transport and ZeroMQ becomes a concurrency framework.
+<!-- TODO: zen-master enlightenment joke here? -->
+
+On the other side of the connection (ZeroMQ has handled routing the message to the appropriate connection for us), worker threads enqueue the message again until you call receive.
+
 
 Now you might be wondering what happens when things go wrong, because the first rule of networking is
 
 # Things Will Fail
 
+If a connection is lost ZeroMQ will intelligently attempt automatic reconnect.
 
-- introduce zmq core concepts
-  - context
-  - socket types
-  - transport
-  - error handling
-- problems it solves
-- implications
-- how can we use this? example patterns (simple to complex)
+If a message send fails, it will retry.
+
+If it decides there is no hope it will return an error in the standard way for your programming language.
+
+If ZeroMQ encounters an internal error it will immediately ASSERT and crash.
+
+This is ZeroMQ's error handling philosophy.
+
+# Be robust to external errors. Be intollerant of bugs.
+
+Now what happens if while we're retrying old messages we're still sending new ones?
+Or if the network is fine but our request replyer is overwhelmed and not able to respond fast enough?
+
+All the ZeroMQ message queues have a configurable "high water mark."
+That is, the queues have a max size.
+Behavior when a particular socket's queue is full is well defined.
+A pub or router socket will drop new sent messages, all other socket types will block.
+Of course there are options to check that you will block and handle these cases yourself.
+
+
+Overall, ZeroMQ is about as good as network programming can get.
+
+
+We've solved non-blocking I/O, dynamic connections, message buffering and congestion, transport transparent communication, message routing, and most classes of networking errors.
+
+A library this simple yet powerful has deep implications for our application architectures.
+Generally, two core patterns emerge.
+Either message passing becomes central to an application (literally the core loop of a program) like an actor system, or fades quietly into the background like logging or metrics collection.
+
+<!-- TOOD: unsolved -->
+
 - what is hard/unsolved?
   - serialization (we've been using just strings)
   - discovery
+- further resources: The Guide
 
 
 - new architectures and possibilities by breaking free of old patterns/tools (http)
