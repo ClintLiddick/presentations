@@ -239,15 +239,49 @@ A library this simple yet powerful has deep implications for our application arc
 Generally, two core patterns emerge.
 Either message passing becomes central to an application (literally the core loop of a program) like an actor system, or fades quietly into the background like logging or metrics collection.
 
-<!-- TOOD: unsolved -->
+Ok, so we've talked a lot about what ZeroMQ can do for us, but there are still some unsolved problems.
 
-- what is hard/unsolved?
-  - serialization (we've been using just strings)
-  - discovery
+The first is serialization.
+What's our actual protocol?
+ZeroMQ just sends raw bytes.
+Fortunately you have lots of options here.
+If you're in one language and ecosystem, you might already have a standard way of serializing messages.
+If you're in the other extreme and need the absolute most maximum flexibility maybe you send json strings.
+Many organizations have found google protobuf or another serialization-first library to be very effective.
+
+One pro tip is you probably want to wrap your messages in some kind of envelope outside your actual serialized data.
+Maybe a fixed size timestamp or counter.
+Or a message type ID, size, or checksum.
+
+ZeroMQ lets you break a single atomic message into multiple frames for easy chunking of data.
+You can even have it automatically filter out messages by matching a byte prefix.
+
+Discovery is another hard problem.
+ZeroMQ requires you to provide an address and transport mechanism.
+You could hard code it, but that will scale for about two days before falling apart.
+You could configure via command line or environmental variables and orchestrate at launch time.
+You could use good old DNS if you control the network.
+There are also centralized service discovery systems like etcd, Consul, or other simple key value stores where you only need to know one resource address to find all the others.
+If you're actually doing some kind of consumer IoT you could also try your hand at implementing some UDP broadcast based discovery protocol.
+
+All these approaches have their own advantages and tradeoffs, and you'll need to consider them as you build out your architecture.
+
+
+<!-- TODO: conc/ipc -->
+
+
+I hope I've given you an idea of the kinds of things ZeroMQ enables.
+I'd be doing you a major disservice if I didn't direct you to dig into the official ZeroMQ documentation called "The Guide."
+It's quite an incredible resource on network programming patterns in general, even if you don't use ZeroMQ itself.
+
+
+
+- summary
 - further resources: The Guide
+- appendix: concurrency/ipc
+- conclusion/call to action
 
 
 - new architectures and possibilities by breaking free of old patterns/tools (http)
 
 
-# The first rule of networking: things will fail
