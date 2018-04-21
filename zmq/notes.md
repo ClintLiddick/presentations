@@ -10,6 +10,15 @@ Could we do it without shaving the world's largest herd of Yaks?
 
 Today we're going to talk about ZeroMQ, and how it can help us write robust and flexible networked and other concurrent applications.
 
+First, a little about myself.
+I work at Aurora Innovation, a self driving car startup here in Pittsburgh and Silicon Valley.
+<!-- TODO logo -->
+Previously I worked at Carnegie Mellon making robots slightly less broken.
+<!-- TODO herb -->
+Autonomous vehicles and other robots are unique kinds of distributed systems.
+They generally have many connected components and systems working together onboard, but also often need to "call home" to fetch data, report locations, or coordinate actions.
+They're quite literally little data centers on wheels.
+Robots a usually little distributed systems without middles.
 
 So what is ZeroMQ?
 
@@ -62,7 +71,7 @@ What if we want to talk to multiple peers? You have to manage a pool of sockets.
 
 For those who haven't had the pleasure, this is what opening a socket looks like.
 
-<!-- beeji socket code -->
+<!-- beej's socket code -->
 
 You also don't get error handling, retry, or uniform behavior on different platforms.
 I'm tired just thinking about it. And I haven't even started thinking about my architecture.
@@ -113,6 +122,7 @@ This is just like a function call.
 <!-- TODO function signature fn: req -> rep -->
 
 Both our send and receive block here, though there is also a polling mechanism if you want to manage a collection of sockets or query message status.
+Most real world applications won't use reply directly, but a router socket we'll describe below.
 
 The next socket types are publish and subscribe.
 <!-- TODO: slide? code example? -->
@@ -230,7 +240,28 @@ A pub or router socket will drop new sent messages, all other socket types will 
 Of course there are options to check that you will block and handle these cases yourself.
 
 
-Overall, ZeroMQ is about as good as network programming can get.
+Now, I've mentioned the fact that ZeroMQ can be used between local processes or threads.
+Using the inter-process communication transport saves a lot of network overhead, but you can still build better fault tolerance into your application with process isolation.
+What that means, is if one process throws and exception, faults, halts, deadlocks, or otherwise crashes it won't take all your other processes down with them.
+Such are the guarantees of an operating system.
+The Erland "let it crash" philosophy works like this.
+<!-- TODO: diagram w/ one box exploding -->
+
+A great use case for IPC is plugin systems.
+If you're writing an application you want to provide plugins for you generally have two options.
+You can dynamically load a library compiled against a binary interface.
+This is fast and fairly simple (it's just like calling any other code really), but what if you want users or other unknown third parties to supply plugins?
+In that case, you might choose to use IPC and separate plugins as independent processes.
+You provide a library and a way of building and registering the plugin, and then launch it at runtime and use message passing to interact with it over some protocol you define.
+
+If anyone has been following the language server protocol work in Rust or at Apple with clangd that's a lot of the same motivations.
+
+Another thing you can do is get actually truly safe in-process concurrency by switching to a message passing paradigm as well.
+Instantiate a context in each thread and connect to an "inproc" transport and you're sending messages, potentially with zero copy, to other threads without shared mutable state.
+ZeroMQ, once again, has taken care of the hard part of doing all the locking and atomic swapping of pointers.
+
+
+Overall, ZeroMQ is about as good as network or parallel programming can get.
 
 
 We've solved non-blocking I/O, dynamic connections, message buffering and congestion, transport transparent communication, message routing, and most classes of networking errors.
@@ -267,21 +298,18 @@ If you're actually doing some kind of consumer IoT you could also try your hand 
 All these approaches have their own advantages and tradeoffs, and you'll need to consider them as you build out your architecture.
 
 
-<!-- TODO: conc/ipc -->
-
-
 I hope I've given you an idea of the kinds of things ZeroMQ enables.
-I'd be doing you a major disservice if I didn't direct you to dig into the official ZeroMQ documentation called "The Guide."
+You can rapidly prototype many kinds of distributed application topologies, and get them to production robustness without wizards.
+You can define the protocol that works for your application.
+
+This actually makes network programming fun, and I hope you go home or go to work and try to build something that talks to something else.
+
+Finally, I'd be doing you a major disservice if I didn't direct you to dig into the official ZeroMQ documentation called "The Guide."
 It's quite an incredible resource on network programming patterns in general, even if you don't use ZeroMQ itself.
 
 
+Now, that's the end of my presentation.
+I'm happy to take any questions now with the group, but please feel free to get up and walk around or leave.
+I'll also be hanging around for a while to chat afterwords.
 
-- summary
-- further resources: The Guide
-- appendix: concurrency/ipc
-- conclusion/call to action
-
-
-- new architectures and possibilities by breaking free of old patterns/tools (http)
-
-
+Thank you.
