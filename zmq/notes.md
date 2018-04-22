@@ -86,19 +86,12 @@ Paths, GET, POST, PUT, DELETE.
 Even front-end JavaScript developers found this metaphore to be insufficient and implemented websockets!
 
 So ZeroMQ.
+<!-- TODO logo -->
 It bills itself as "sockets on steroids."
 The code is simple (I'll explain more what's going on in a moment).
-We get:
-- non-blocking I/O (it manages the background thread)
-- Dynamic connections and automatic retry
-- Message buffering and congestion handling
-- A consistent API over mulitple transports, even local IPC and in-process
-- Message routing
-- Network errors
-
-This code isn't simple just because it's Python either.
-The C version is only a few lines longer because of error code checking.
-And ZeroMQ has bindings for almost any language you could name
+And not just because it's Python either.
+The C version is the same length.
+And ZeroMQ has bindings for tons of languages.
 
 <!-- TODO: lang list -->
 
@@ -116,8 +109,9 @@ These are not standard sockets, but the metaphore is ok.
 There are different types of sockets that provide different communication patterns.
 
 In our example we use the request (REQ) and reply (REP) socket types to get a two-way, RPC-like pattern.
-Usually a "server" or more stable, static, or known part of your architecture is acting as the reply socket (the receiver of requests).
 This is just like a function call.
+You provide some arguments, and get a result.
+Usually a "server" or more stable, static, or known part of your architecture is acting as the reply socket (the receiver of requests).
 
 <!-- TODO function signature fn: req -> rep -->
 
@@ -145,6 +139,7 @@ Now there are other more complex socket types as well that we can only cover bri
 The XPUB and XSUB sockets are just like their pub/sub counterparts but they also pass along subscription information.
 When a socket connects or drops for example.
 You can use this to create routers or proxies by forwarding messages along to another socket transparently.
+This is such a common pattern ZeroMQ actually provides a helper function for creating a transparent proxy just like this.
 
 <!-- TODO: proxy diagram -->
 
@@ -159,17 +154,15 @@ You can also get a native TCP streaming socket, in case you want to get really n
 
 Whew.
 That was a lot.
+There are actually several more socket types, some of which are preferred instead of the above types in recent versions of ZeroMQ, so I highly recommend you check out the ZeroMQ socket documentation.
+However, these types form a core conceptual basis for how ZeroMQ works and what it can do.
 
-Let's step back and look at a couple simple examples using these sockets.
+Now. Let's step back and look at a couple simple examples using these sockets.
 
 We have our ping pong example for request and reply.
 You could imagine a lot of REST APIs where you're not really posting a document but invoking some action on a server somewhere and getting a response (even if it's just a success or failure code).
 RPC is an old but excellent mechanism.
 
-<!-- TODO clint new example -->
-As a publish/subscribe example, let's a lightweight remote logging mechanism.
-
-<!-- TODO: many servers with many pubishers with one aggregator -->
 
 Alright, now let's do a bunch of compute intensive processing.
 Say we want to process a bunch of images.
@@ -273,12 +266,12 @@ Either message passing becomes central to an application (literally the core loo
 Ok, so we've talked a lot about what ZeroMQ can do for us, but there are still some unsolved problems.
 
 The first is serialization.
-What's our actual protocol?
+What's our actual wire protocol?
 ZeroMQ just sends raw bytes.
 Fortunately you have lots of options here.
 If you're in one language and ecosystem, you might already have a standard way of serializing messages.
 If you're in the other extreme and need the absolute most maximum flexibility maybe you send json strings.
-Many organizations have found google protobuf or another serialization-first library to be very effective.
+Many organizations have found google protobuf or other serialization-first libraries to be very effective.
 
 One pro tip is you probably want to wrap your messages in some kind of envelope outside your actual serialized data.
 Maybe a fixed size timestamp or counter.

@@ -150,6 +150,7 @@ REBOL 3<br>
 Red<br>
 R (pbdR)<br>
 Ruby<br>
+Rust<br>
 Scala<br>
 Smalltalk<br>
 Swift<br>
