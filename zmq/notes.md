@@ -78,6 +78,7 @@ You also don't get error handling, retry, or uniform behavior on different platf
 I'm tired just thinking about it. And I haven't even started thinking about my architecture.
 
 
+<!-- TODO: slide -->
 What about HTTP? 
 
 We use it all the time, maybe there's something there.
@@ -150,6 +151,7 @@ You can use this to create routers or proxies by forwarding messages along to an
 This is such a common pattern ZeroMQ actually provides a helper function for creating a transparent proxy just like this.
 
 
+<!-- TODO: proxy slide -->
 The DEALER and ROUTER socket types are like reply and request sockets with N to M round robining.
 That means you can serve requests to multiple different "servers" to do the work, and because of some extra routing metadata the answer gets back to the right requestor.
 
@@ -161,9 +163,10 @@ That was a lot.
 There are actually several more socket types, some of which are preferred instead of the above types in recent versions of ZeroMQ, so I highly recommend you check out the ZeroMQ socket documentation.
 However, these types form a core conceptual basis for how ZeroMQ works and what it can do.
 
-Now. Let's step back and look at a couple simple examples using these sockets.
+Now. Let's step back and look at a couple of use cases for these sockets.
 
 
+<!-- TODO: real example -->
 We have our ping pong example for request and reply.
 You can imagine a lot of REST APIs where you're not really posting a document but invoking some action on a server somewhere and getting a response (even if it's just a success or failure code).
 RPC is an old but excellent mechanism.
@@ -191,7 +194,6 @@ Ok, now, let's go deeper.
 
 What happens when you actually send a message?
 ZeroMQ takes your message and puts it in a message queue.
-<!-- TODO: diagram -->
 
 Then background I/O worker threads actually push your message out over your selected transport.
 Background threads are NOT one per client or one per connection.
@@ -260,6 +262,7 @@ This is fast and fairly simple (it's just like calling any other code really), b
 In that case, you might choose to use IPC and separate plugins as independent processes.
 You provide a library and a way of building and registering the plugin, and then launch it at runtime and use message passing to interact with it over some protocol you define.
 
+You could also just provide the server as the public API, allowing any external to interact with your program.
 If anyone has been following the language server protocol work in Rust or at Apple with clangd that's a lot of the same motivations.
 
 Another thing you can do is get actually truly safe in-process concurrency by switching to a message passing paradigm as well.
@@ -295,7 +298,7 @@ One pro tip is you probably want to wrap your messages in some kind of envelope 
 Maybe a fixed size timestamp or counter.
 Or a message type ID, size, or checksum.
 
-ZeroMQ lets you break a single atomic message into multiple frames for easy chunking of data.
+Since ZeroMQ lets you break a single atomic message into multiple frames for easy chunking of data.
 You can even have it automatically filter out messages by matching a byte prefix.
 
 Discovery is another hard problem.
@@ -316,7 +319,7 @@ If you're actually doing some kind of consumer IoT you could also try your hand 
 
 All these approaches have their own advantages and tradeoffs, and you'll need to consider them as you build out your architecture.
 
-Before we wrap up I'd like to discuss some alternatives to ZeroMQ, and when ZeroMQ might not be fore you.
+Before we wrap up I'd like to discuss some alternatives to ZeroMQ, and when ZeroMQ might not be for you.
 
 If you're just trying to do HTTP and document or REST style APIs, there are many great libraries and patterns to get the job done.
 You can't implement or interop with HTTP with ZeroMQ because they have different wire protcols.
@@ -352,4 +355,3 @@ Thank you.
 <!-- TODO: lazy pirate -->
 <!-- TODO: msg Q? -->
 <!-- TODO: zen joke? -->
-<!-- TODO: plugin arch -->
