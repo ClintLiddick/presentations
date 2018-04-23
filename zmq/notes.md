@@ -96,6 +96,10 @@ And not just because it's Python either.
 The C version is the same length.
 And ZeroMQ has bindings for tons of languages.
 
+It's also easy to integrate into any kind of project, being just a single library with no dependencies.
+It's licensed under LGPL BUT with a static linking exception.
+So no matter how you're packaging or delivering software, even closed source, as long as you don't modify ZeroMQ itself you are safe.
+
 Let's go back to our first example now and talk about how ZeroMQ works.
 
 The first API is the Context object.
@@ -285,6 +289,7 @@ Many organizations have found serialization-first libraries to be very effective
 Google's protobuf library is a popular and robust choice.
 You specify your data structure in a special definition language, and generate code for one or several client languages.
 Then, you can serialize data with the protobuf libraries, send over the wire, and deserialize with consistency checks on the other end, even in a different programming language.
+Here is an example of a generic image message, creating and send in both Python and C++.
 
 One pro tip is you probably want to wrap your messages in some kind of envelope outside your actual serialized data.
 Maybe a fixed size timestamp or counter.
@@ -311,12 +316,28 @@ If you're actually doing some kind of consumer IoT you could also try your hand 
 
 All these approaches have their own advantages and tradeoffs, and you'll need to consider them as you build out your architecture.
 
+Before we wrap up I'd like to discuss some alternatives to ZeroMQ, and when ZeroMQ might not be fore you.
+
+If you're just trying to do HTTP and document or REST style APIs, there are many great libraries and patterns to get the job done.
+You can't implement or interop with HTTP with ZeroMQ because they have different wire protcols.
+
+If you're only looking for an RPC solution, then gRPC (now owned by the Apache Foundation), is a battle tested and widely supported solution.
+It carries some baggage and gotchas of its own however, and requires fairly modern infrastructure to do complex networking over TLS.
+
+If you really actually want a true message queue or broker, especially one supporting MQTT (popular for IoT applications) consider RabbitMQ.
+
+If you need a high performance streaming message framework, Apache Kafka might work well.
+
+If you specifically need very lightweight pull-based metrics and monitoring, Prometheus has your back.
+
+However.
+If you need all of the above, some hybrid system or maybe something completely different, ZeroMQ can do it all.
 
 I hope I've given you an idea of the kinds of things ZeroMQ enables.
 You can rapidly prototype many kinds of distributed application topologies, and get them to production robustness without wizards.
 You can define the protocol that works for your application.
 
-This actually makes network programming fun, and I hope you go home or go to work and try to build something that talks to something else.
+More than anything else, this actually makes network programming fun, and I hope you go home or go to work and try to build something that talks to something else.
 
 Finally, I'd be doing you a major disservice if I didn't direct you to dig into the official ZeroMQ documentation called "The Guide."
 It's quite an incredible resource on network programming patterns in general, even if you don't use ZeroMQ itself.
@@ -331,10 +352,4 @@ Thank you.
 <!-- TODO: lazy pirate -->
 <!-- TODO: msg Q? -->
 <!-- TODO: zen joke? -->
-<!-- TODO: scale diagram -->
-<!-- TODO: easy to integrate + license -->
-<!-- TODO: parallel img -> multithreaded -->
 <!-- TODO: plugin arch -->
-<!-- TODO: alternatives: grpc -->
-<!-- TODO: alternatives: brokers/msg queues (rabbit for Q, kafka for streaming) -->
-<!-- TODO: alternatives: prometheus for logging -->
